@@ -17,6 +17,8 @@
 
 # The name of the script being executed.
 HADOOP_SHELL_EXECNAME="hadoop"
+# BASH_SOURCE 是一个数组，第一个元素是当前脚本的名称
+# ${BASH_SOURCE-$0} 获取脚本名称
 MYNAME="${BASH_SOURCE-$0}"
 
 ## @description  build up the hadoop command's usage text.
@@ -183,15 +185,23 @@ function hadoopcmd_case
 # This script runs the hadoop core commands.
 
 # let's locate libexec...
+# -n 是字符串测试，判断是否为空，不空为 true，空为 false
 if [[ -n "${HADOOP_HOME}" ]]; then
   HADOOP_DEFAULT_LIBEXEC_DIR="${HADOOP_HOME}/libexec"
 else
+  # -P 参数表示切换到物理路径而不是软链接的地址
   bin=$(cd -P -- "$(dirname -- "${MYNAME}")" >/dev/null && pwd -P)
   HADOOP_DEFAULT_LIBEXEC_DIR="${bin}/../libexec"
 fi
 
+# ${var:-word}	如果var为空或者未设定，返回word，var不变
+# ${var:=word}	如果var为空或者未设定，返回word，且var=word
+# ${var:+word}	如果var有值，返回word，var不变
+# ${var:?word}	如果变量var为空或者未设定，返回word并退出shell，word没有值则输出：parameter null or not set，用于检测var是否被正常赋值
+# ${var-word}	如果var未设定，返回word，如果var未空或者有值，返回var
 HADOOP_LIBEXEC_DIR="${HADOOP_LIBEXEC_DIR:-$HADOOP_DEFAULT_LIBEXEC_DIR}"
 HADOOP_NEW_CONFIG=true
+# -f 文件是否存在
 if [[ -f "${HADOOP_LIBEXEC_DIR}/hadoop-config.sh" ]]; then
   # shellcheck source=./hadoop-common-project/hadoop-common/src/main/bin/hadoop-config.sh
   . "${HADOOP_LIBEXEC_DIR}/hadoop-config.sh"
@@ -203,10 +213,14 @@ fi
 # now that we have support code, let's abs MYNAME so we can use it later
 MYNAME=$(hadoop_abs "${MYNAME}")
 
+# $# 表示参数个数
 if [[ $# = 0 ]]; then
+  # 该函数在 libexec 目录下的 hadoop-functions.sh 中定义
+  # 用于退出并且答应帮助信息
   hadoop_exit_with_usage 1
 fi
 
+# 例如：distcp
 HADOOP_SUBCMD=$1
 shift
 

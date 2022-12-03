@@ -38,6 +38,8 @@
 # settings that might be different between daemons & interactive
 
 # you must be this high to ride the ride
+# -z 字符串是否为空
+# BASH_VERSINFO[0] 可以获取 bash 脚本的大版本号
 if [[ -z "${BASH_VERSINFO[0]}" ]] \
    || [[ "${BASH_VERSINFO[0]}" -lt 3 ]] \
    || [[ "${BASH_VERSINFO[0]}" -eq 3 && "${BASH_VERSINFO[1]}" -lt 2 ]]; then

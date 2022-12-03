@@ -282,6 +282,7 @@ function hadoop_uservar_su
 
     svar=$(hadoop_build_custom_subcmd_var "${program}" "${command}" SECURE_USER)
 
+    # -n 是否不空，不空为真
     if [[ -n "${!uvar}" ]]; then
       hadoop_su "${!uvar}" "$@"
     elif [[ -n "${!svar}" ]]; then
@@ -2400,10 +2401,11 @@ function hadoop_verify_user_perm
 ## @param        subcommand
 ## @return       1 on no re-exec needed
 ## @return       0 on need to re-exec
+# 例如：hadoop_need_reexec hadoop "${HADOOP_SUBCMD}"
 function hadoop_need_reexec
 {
-  declare program=$1
-  declare command=$2
+  declare program=$1 # hadoop
+  declare command=$2 # distcp
   declare uvar
 
   # we've already been re-execed, bail
